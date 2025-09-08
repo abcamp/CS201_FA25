@@ -54,7 +54,19 @@ options(scipen = 999)
 
 Explanation:
 
--   
+-   **Computers store numbers in binary (base-2)**, not decimal (base-10)
+
+-   Some decimal fractions — like `0.1` and `0.3` — **cannot be represented exactly** in binary
+
+    -   Think of how 1/3 can’t be written exactly as a finite decimal (0.3333… forever)
+
+-   When you add and subtract these approximations, you get a result that’s very close to zero, but not exactly
+
+-   This isn’t a bug! It’s how computers handle decimal math. The answer is *almost* zero, just not perfectly, because 0.1 can’t be stored exactly in binary
+
+-   You can check for "closeness" by using `all.equal(0.1 + 0.1 + 0.1, 0.3)` (should equal `TRUE`)
+
+-   Thanks Sano, Calvin, and Brandon for helping to explain!
 
 ------------------------------------------------------------------------
 
