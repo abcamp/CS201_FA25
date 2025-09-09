@@ -12,7 +12,7 @@
 📆 By appointment, [sign up](https://calendar.app.google/eanj8A5keYwNhkdA7) or email amber.camp@chaminade.edu
 
 
-💻 I **strongly reccommed attending office hours** for any of the following:
+💻 I **strongly recommend attending office hours** for any of the following:
 
 - Troubleshooting code
 - Chatting about the theory behind the code
