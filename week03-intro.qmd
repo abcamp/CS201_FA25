@@ -180,18 +180,17 @@ Create a scatterplot and histogram and boxplot of two variables of your choice (
 
 ```{r}
 plot(mtcars$mpg, mtcars$hp,
-     xlab = "mpg", ylab = "hp",
+     xlab = "Miles Per Gallon (mpg)", ylab = "Horsepower (hp)",
      main = "Tallen's Scatterplot")
 
 hist(mtcars$qsec,
-     xlab = "1/4 mile time", ylab = "count",
+     xlab = "1/4 Mile Time (qsec)", ylab = "Count",
      main = "Vlad's Histogram")
 
-boxplot(mtcars$am, mtcars$qsec,
-        xlab = "transmission type", ylab = "time to 1/4 mi",
-        main = "Calvin's Boxplot") # i don't know why this looks problematic, but the syntax is correct!
-
-summary(mtcars$qsec)
+# NOTE this has been corrected since we met in class
+boxplot(qsec ~ am, data = mtcars,
+        xlab = "Transmission Type", ylab = "Time to 1/4 mi",
+        main = "Calvin's Boxplot")
 ```
 
 Save, stage, commit, and push to GitHub!!
