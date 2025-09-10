@@ -189,7 +189,7 @@ hist(mtcars$qsec,
 
 boxplot(mtcars$am, mtcars$qsec,
         xlab = "transmission type", ylab = "time to 1/4 mi",
-        main = "Calvin's Boxplot")
+        main = "Calvin's Boxplot") # i don't know why this looks problematic, but the syntax is correct!
 
 summary(mtcars$qsec)
 ```
