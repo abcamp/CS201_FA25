@@ -71,6 +71,9 @@ Note that all of these methods of reading data in to R are *reproducible* meanin
 
 ```{r, message=FALSE}
 
+url_gentoo <- "https://pasta.lternet.edu/package/data/eml/knb-lter-pal/220/3/e03b43c924f226486f2f0ab6709d2381"
+
+gentoo_data_from_url <- read_csv(url_gentoo)
 
 ```
 
@@ -121,6 +124,9 @@ Awesome, now all of our column names are clean and our dataframe is ready for an
 The `skim()` function from the `skimr` package gives us a cool overview of the data with one line of code
 
 ```{r, message=FALSE}
+summary(penguins_data)
+head(penguins_data)
+
 skimr::skim(penguins_data)
 ```
 
@@ -134,7 +140,17 @@ What other packages/functions do a similar thing?
 
 -   Type your answer(s) in bullet points below
 
-    -   
+    -   skimr
+
+    -   pastecs
+
+    -   Hmisc
+
+    -   summarytool
+
+    -   DataExplorer
+
+    -   psych
 
 -   Let's check out `DataExplorer`
 
@@ -172,9 +188,9 @@ The magic of `ggplot2` is simplicity and *customization* so let's customize, bas
 
 ![](https://allisonhorst.github.io/palmerpenguins/reference/figures/lter_penguins.png){fig-align="center" width="50%"}
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 ggplot(data = penguins_data, aes(x = flipper_length_mm, fill = species)) +
-  geom_histogram() +
+  geom_histogram(alpha = 0.5) + # alpha adds transparency
   theme_bw() +
   scale_fill_manual(values = c("darkorange","darkorchid","cyan4")) +
   labs(title = "Palmer Penguins, Distribution of Flipper Length",
@@ -190,7 +206,7 @@ Manually choosing colors is cool, but there are also color palettes available fo
 ggplot(data = penguins_data, aes(x = flipper_length_mm, fill = species)) +
   geom_histogram() +
   theme_bw() + 
-  scale_fill_viridis_d() + # try adding option = "A", "C", "E", etc. These also have names! See documentation.
+  scale_fill_viridis_d(option="magma") + # try adding option = "A", "C", "E", etc. These also have names! See documentation.
   labs(title = "Palmer Penguins, Distribution of Flipper Length",
        subtitle = "3 penguin species observed on three islands in the Palmer Archipelago, Antarctica",
        x = "Flipper Length (mm)",
@@ -231,7 +247,8 @@ ggplot(data = penguins_data, aes(x = flipper_length_mm, y = body_mass_g)) +
 Cool! Let's add species to this plot. What about island?
 
 ```{r, message=FALSE}
-
+ggplot(data = penguins_data, aes(x = flipper_length_mm, y = body_mass_g, color = species, shape = island)) +
+  geom_point()
   
 ```
 
