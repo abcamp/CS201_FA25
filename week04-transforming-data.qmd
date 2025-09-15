@@ -95,10 +95,17 @@ penguins_male_female <- penguins_data %>%
 
 -   Notice in our environment pane (top right) that our \# of observations went from 344 in the dataframe `penguins_data` to 333 observation in `penguins_male_female`
 
-Let's let's make the same faceted scatter plot from the new dataframe. Can you make it interactive using `plotly`?
+Let's make the same faceted scatter plot from the new dataframe. Can you make it interactive using `plotly`?
 
 ```{r, message=FALSE}
-
+ggplot(data = penguins_data, aes(x = flipper_length_mm, y= , fill = species)) +
+  geom_point() +
+  theme_bw() + 
+  scale_fill_viridis_d(option="magma") + # try adding option = "A", "C", "E", etc. These also have names! See documentation.
+  labs(title = "Palmer Penguins, Distribution of Flipper Length",
+       subtitle = "3 penguin species observed on three islands in the Palmer Archipelago, Antarctica",
+       x = "Flipper Length (mm)",
+       y = "Number of Penguins")
 
 ```
 
@@ -121,7 +128,7 @@ How about if we wanted to make a bar graph of the *average body mass by species*
 2.  Now, create a bar graph using the *new* dataframe you made
 
     ```{r}
-    ggplot(data = , aes(x = , y = )) + # fill in the blanks
+    ggplot(data = average_mass, aes(x = species, y = average_body_mass)) + # fill in the blanks
       geom_bar(stat = "identity") # tells ggplot to use the actual y-values from your data, instead of counting the number of rows like a typical bar plot does
     ```
 
