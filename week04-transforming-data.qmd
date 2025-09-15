@@ -98,15 +98,16 @@ penguins_male_female <- penguins_data %>%
 Let's make the same faceted scatter plot from the new dataframe. Can you make it interactive using `plotly`?
 
 ```{r, message=FALSE}
-ggplot(data = penguins_data, aes(x = flipper_length_mm, y= , fill = species)) +
+mass_plot <- ggplot(data = penguins_male_female, aes(x = flipper_length_mm, y = body_mass_g, color = species, shape = island)) +
   geom_point() +
-  theme_bw() + 
-  scale_fill_viridis_d(option="magma") + # try adding option = "A", "C", "E", etc. These also have names! See documentation.
-  labs(title = "Palmer Penguins, Distribution of Flipper Length",
-       subtitle = "3 penguin species observed on three islands in the Palmer Archipelago, Antarctica",
-       x = "Flipper Length (mm)",
-       y = "Number of Penguins")
+  theme_bw() +
+  scale_color_viridis_d() +
+  facet_wrap(~sex) + # here is where we designate faceting!
+   labs(title = "Palmer Penguins, Flipper Length & Body Mass",
+       x = "flipper length (mm)",
+       y = "body mass (g)")
 
+ggplotly(mass_plot)
 ```
 
 Bonus: Instead of `facet_wrap()`, try using `facet_grid(island ~ sex)`. Now you have a grid layout with `island` on one axis and `sex` on the other.
