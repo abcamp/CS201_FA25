@@ -85,7 +85,7 @@ unique(penguins_data$sex)
 sum(is.na(penguins_data$sex))
 ```
 
-Let's filter for observations where `sex` is either male or female and drop observations with `NA` in that
+Let's filter for observations where `sex` is either male or female and drop observations with `NA` in that column, and save it to a new object.
 
 ```{r, message=FALSE}
 penguins_male_female <- penguins_data %>% 
@@ -95,7 +95,7 @@ penguins_male_female <- penguins_data %>%
 
 -   Notice in our environment pane (top right) that our \# of observations went from 344 in the dataframe `penguins_data` to 333 observation in `penguins_male_female`
 
-Let's make the same faceted scatter plot from the new dataframe. Can you make it interactive using `plotly`?
+Let's make the same \[syle of\] faceted scatter plot from the new dataframe. Can you make it interactive using `plotly`?
 
 ```{r, message=FALSE}
 mass_plot <- ggplot(data = penguins_male_female, aes(x = flipper_length_mm, y = body_mass_g, color = species, shape = island)) +
@@ -140,14 +140,22 @@ In the code chunk below, create a new dataframe called `average_flipper_length` 
 Bonus: If you assign this to a new object name, you can then use `view(object_name)` to see your results as a table.
 
 ```{r, message=FALSE}
-
+average_flipper_length <- penguins_data %>% 
+  group_by(species) %>% 
+  summarise(average_flipper_length = mean(flipper_length_mm, na.rm = TRUE))
 
 ```
 
 In the code chunk below, plot `average_flipper_length` using `ggplot()` and `geom_bar`. Customize the graph with colors, a theme, and labels, etc., as you wish.
 
 ```{r, message=FALSE}
-
+ggplot(data = average_flipper_length, aes(x = species, y = average_flipper_length, fill = species)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  coord_flip() +
+  theme(legend.position = "none") +
+  labs(title = "TITLE", subtitle = "subtitle", x = "", y = "flippy")
+  
 
 ```
 
@@ -157,9 +165,11 @@ Create a boxplot of body mass by species & make the plot interactive
 
 -   Hints: `geom_boxplot()`, `ggplotly()`
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
+ex2 <- ggplot(data = penguins_data, aes(x = species, y = body_mass_g, fill = species)) +
+  geom_boxplot()
 
-
+ggplotly(ex2)
 ```
 
 ## Exercise 3
@@ -170,7 +180,12 @@ How many penguins live on each Island?
 
 ```{r, message=FALSE}
 
+summary(as.factor(penguins_data$island))
 
+table(penguins_data$island)
+
+penguins_data %>% 
+  count(island)
 ```
 
 ## Exercise 4
@@ -179,9 +194,19 @@ Create a dataframe that has the average culmen depth for each species. Then, mak
 
 ```{r, message=FALSE}
 
+average_culmen_depth <- penguins_data %>% 
+  group_by(species) %>% 
+  summarise(average_culmen_depth = mean(culmen_depth_mm, na.rm = TRUE))
+
+ggplot(data = average_culmen_depth, aes(x = species, y = average_culmen_depth)) +
+  geom_bar(stat = "identity")
 
 ```
 
 ## Push to GitHub!
 
 Use the RStudio to commit & push to GitHub. Ask for help if needed!
+
+## Note:
+
+Up until now, we’ve mostly *looked* at the data: visualizing it, exploring it with scatterplots and boxplots, etc. But in order to answer more specific questions or clean up the data for analysis, we need to actually *transform* it, like filtering out bad rows, computing group averages, or creating new columns. That's where `dplyr` comes in, and that is what Assignment 3 is about.
