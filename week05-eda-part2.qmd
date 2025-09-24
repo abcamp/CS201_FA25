@@ -53,13 +53,13 @@ By the way, if you want to save this as a new csv, just run the below. I'm going
 
 How do we read boxplots? Also called box and whisker plot/diagram.
 
--   Middle line:
+-   Middle line: median (Sadie)
 
--   Box:
+-   Box: the middle 50% of data (25%-75%). IQR inter-quartile range
 
--   Whiskers:
+-   Whiskers: Grace & Sano & Karl
 
--   Dots:
+-   Dots: basically outliers (Johnny)
 
 ```{r, message=FALSE}
 ggplot(pokedata, aes(y = hp)) +
@@ -73,11 +73,11 @@ ggplot(pokedata, aes(x = fct_reorder(type_1, hp, median), y = hp)) +
 
 ggplot(pokedata, aes(x = fct_reorder(type_1, hp, median), y = hp)) +
   geom_boxplot() +
-  geom_point(alpha = 0.5) # try jitter, width of 0.2
+  geom_jitter(width = 0.2, alpha = 0.5) # try jitter, width of 0.2
 
 ggplot(pokedata, aes(x = type_1, y = hp)) +
   geom_boxplot() +
-  facet_wrap(~generation) + # try face_grid()
+  facet_wrap(~generation) + # try facet_grid()
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) # note code to rotate labels
 ```
 
@@ -87,7 +87,7 @@ ggplot(pokedata, aes(x = type_1, y = hp)) +
 
 -   `%>%` is also called `dplyr` pipe, `magrittr` pipe, pipe operator
 
--   Do they work differently?
+-   Do they work differently? No
 
 ## Tip!
 
@@ -121,8 +121,10 @@ Options:
 -   Can you rotate the labels on the x-axis? Make the font smaller?
 
 ```{r}
-
-
+ggplot(data = na.omit(pokedata), aes(x = type_2, fill = generation)) +
+  geom_bar() +
+  facet_wrap(~type_1) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 7))
 ```
 
 ## Covariation
@@ -178,7 +180,7 @@ Looks like there are other factors that could affect `price` – not just `cut`.
 
 ```{r, message=FALSE}
 ggplot(diamonds, aes(x = carat, y = price)) +
-  geom_point() # try making the points transparent to 0.05
+  geom_point(alpha = 0.05) # try making the points transparent to 0.05
 ```
 
 We can see the general trends, but it's a bit difficult to really see what is going on. Back to boxplots!
@@ -188,7 +190,8 @@ We can see the general trends, but it's a bit difficult to really see what is go
 First, we'll try making a boxplot with `x = carat` and `y = price`
 
 ```{r, message=FALSE}
-
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_boxplot()
 ```
 
 It doesn't work that way! Boxplots are designed for categorical (factor) variables on the x-axis, and `carat` is continuous.
@@ -238,9 +241,9 @@ Between `color`, `clarity`, and `carat`, which do you think is the best predicto
 (If you took DS-303 last semester, you might even try a quick linear regression to check!)
 
 ```{r}
-# library(lme4)
-# model <- (build your model here!)
-# summary(model)
+library(lme4)
+model <- lm(price ~ cut + carat +clarity + color, diamonds)
+summary(model)
 
 ```
 
