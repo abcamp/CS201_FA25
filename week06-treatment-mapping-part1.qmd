@@ -84,13 +84,16 @@ teds_d %>%
 Replace values as needed.
 
 ```{r}
-
+teds_d[teds_d == "-9"] <- NA
 ```
 
 Inspect once again.
 
 ```{r}
+miss_var_summary(teds_d)
 
+teds_d %>% 
+  tabyl(reason)
 ```
 
 ### Variable Re-coding
@@ -102,7 +105,19 @@ Many of the variables are currently in a format that is not helpful for our anal
 Start by inspecting this variable. Next, look up the Frequency of Use at Discharge variable in the codebook (`freq1_d`)
 
 ```{r}
+class(teds_d$freq1_d)
+summary(teds_d$freq1_d)
 
+teds_d <- teds_d %>%
+  mutate(freq1_d = recode(as.character(freq1_d),
+                          "1" = "no use",
+                          "2" = "some use",
+                          "3" = "daily use",
+                          .missing = "unknown"),
+         freq1_d = factor(freq1_d))
+
+teds_d %>% 
+  tabyl(freq1_d) 
 ```
 
 #### Services
@@ -110,7 +125,21 @@ Start by inspecting this variable. Next, look up the Frequency of Use at Dischar
 Apply the relevant recoding for `services_d`
 
 ```{r}
+teds_d <- teds_d %>%
+  mutate(services_d = recode(as.character(services_d),
+                          "1" = "Detox, 24-hour, hospital inpatient ",
+                          "2" = "Detox, 24-hour, free-standing residential ",
+                          "3" = "Rehab/residential, hospital (non-detox) ",
+                          "4" = "Rehab/residential, short term (30 days or fewer) ",
+                          "5" = "Rehab/residential, long term (more than 30 days) ",
+                          "6" = "Ambulatory, intensive outpatient ",
+                          "7" = "Ambulatory, non-intensive outpatient ",
+                          "8" = "Ambulatory, detoxification ",
+                          .missing = "unknown"),
+         services_d = factor(services_d))
 
+teds_d %>% 
+  tabyl(services_d) 
 ```
 
 #### Reason
@@ -118,15 +147,45 @@ Apply the relevant recoding for `services_d`
 Apply the relevant recoding for the Reason for Discharge variable.
 
 ```{r}
+teds_d <- teds_d %>%
+  mutate(reason = recode(as.character(reason),
+                          "1" = "Treatment completed",
+                          "2" = "Dropped out of treatment",
+                          "3" = "Terminated by facility",
+                          "4" = "Transferred to another treatment program or facility ",
+                          "5" = "Incarcerated",
+                          "6" = "Death",
+                          "7" = "Other",
+                          .missing = "unknown"),
+         reason = factor(reason))
 
+teds_d %>% 
+  tabyl(reason) 
 ```
 
 ## Quick Plotting Exercise
 
-Create three basic visualizations using `ggplot2` and the variables you recoded above.
+Create three basic visualizations using `ggplot2` and the variables you recoded above. Bar plots are a good idea :)
 
 ```{r}
+freq_p <- ggplot(teds_d, aes(x = fct_infreq(freq1_d))) +
+  geom_bar() +
+  coord_flip() +
+  labs(x = "Frequency of Use of Discharge")
 
+services_p <- ggplot(teds_d, aes(x = fct_infreq(services_d))) +
+  geom_bar() +
+  coord_flip() +
+  labs(x = "Treatement Service")
+
+reason_p <- ggplot(teds_d, aes(x = fct_infreq(reason))) +
+  geom_bar() +
+  coord_flip() +
+  labs(x = "Reason for Discharge Discharge")
+
+ggplotly(freq_p)
+ggplotly(services_p)
+ggplotly(reason_p)
 ```
 
 ## Do before Wednesday's Class
