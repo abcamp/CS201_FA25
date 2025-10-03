@@ -87,10 +87,13 @@ Next, we will want to combine the `states_map` and `percent_completed_by_state` 
 
 That index will be "stfips". But what do we notice that's different between the columns that contain the "stfips" information in `percent_completed_by_state` and `states_map`? (two differences)
 
-Answer:
+Answer: variable names are different. one has numbers starting with zero and the other does not.
 
 ```{r}
+# copies stfips data to create new column in percent_completed_by_state df called state_fips, forcing values to be two digits (start with zero)
 
+percent_completed_by_state <- percent_completed_by_state %>%
+  mutate(state_fips = sprintf("%02d", stfips)) 
 ```
 
 ### Joining data
@@ -145,7 +148,22 @@ You can customize the tooltip (to a degree). Try rounding that completed % value
 
 ```{r}
 
+completed_treatment_map_int <- ggplot(percent_completed_by_state_map) +
+  geom_sf_interactive(
+    mapping = aes(geometry = geometry,
+      fill = percentage_completed,
+      tooltip = paste("State:", state_abbv,
+                      "<br>FIPS:", stfips, 
+                      "<br>Completed:", round(percentage_completed,2), "%")),
+    color = "#ffffff",
+    size = 0.25) +
+  labs(fill = "% of Completed Treatment Episodes") +
+  coord_sf(datum = NA) +
+  theme_minimal()
 
+
+# Use `girafe` to render the interactive plot
+girafe(ggobj = completed_treatment_map_int) # check your spelling!
 ```
 
 ### Clean up the color binning
@@ -174,7 +192,7 @@ percent_complete_binned_int <- ggplot(percent_completed_by_state_map) +
   labs(fill = "% of Completed Treatment Episodes",
        title = "Completed Treatment Episodes by State",
        subtitle = "TEDS-D Dataset (SAMHSA)") +
-  scale_fill_viridis_d(option = "mako", direction = -1) + # i flipped the direction of the color scale so dark = high and light = low
+  scale_fill_viridis_d(option = "plasma", direction = -1) + # i flipped the direction of the color scale so dark = high and light = low
   coord_sf(datum = NA) +
   theme_minimal() +
   theme(panel.background = element_blank(),
