@@ -217,7 +217,7 @@ Notice anything weird with the above?? Try to figure out how to fix the problemâ
 
 Together, we found that West Virginia is not being displayed on the map (it is binned as `NA`). There is treatment data for West Virginia in our dataset, but it just so happens that none of the observations have `reason = "Treatment completed"`.
 
-We still want West Virginia to show up on our map, though. It is one of the 50 states people expect to see, and to have it missing looks a bit jarring in our visualization. There are a few approaches to fixing this, but here are three:
+We still want West Virginia to show up on our map, though. It is one of the 50 states people expect to see, and to have it missing looks a bit jarring in our visualization. There are a few approaches to fixing this, but here are three below. The option you choose is a researcher choice.
 
 #### Option 1
 
