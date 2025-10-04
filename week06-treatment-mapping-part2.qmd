@@ -4,6 +4,7 @@ author: "Amber Camp"
 date: "`r Sys.Date()`"
 format: html
 editor: visual
+toc: true
 ---
 
 ## Load Libraries
@@ -192,7 +193,7 @@ percent_complete_binned_int <- ggplot(percent_completed_by_state_map) +
   labs(fill = "% of Completed Treatment Episodes",
        title = "Completed Treatment Episodes by State",
        subtitle = "TEDS-D Dataset (SAMHSA)") +
-  scale_fill_viridis_d(option = "plasma", direction = -1) + # i flipped the direction of the color scale so dark = high and light = low
+  scale_fill_viridis_d(option = "mako", direction = -1) + # i flipped the direction of the color scale so dark = high and light = low
   coord_sf(datum = NA) +
   theme_minimal() +
   theme(panel.background = element_blank(),
@@ -209,6 +210,146 @@ girafe(ggobj = percent_complete_binned_int)
 ## For Friday's Class
 
 Notice anything weird with the above?? Try to figure out how to fix the problem—you'll need it for your homework. I'll show you a solution on Friday.
+
+------------------------------------------------------------------------
+
+## Friday Addition (10/3)
+
+Together, we found that West Virginia is not being displayed on the map (it is binned as `NA`). There is treatment data for West Virginia in our dataset, but it just so happens that none of the observations have `reason = "Treatment completed"`.
+
+We still want West Virginia to show up on our map, though. It is one of the 50 states people expect to see, and to have it missing looks a bit jarring in our visualization. There are a few approaches to fixing this, but here are three:
+
+#### Option 1
+
+Assign a color to `NA` values in `ggplot`:
+
+```{r}
+option1 <- ggplot(percent_completed_by_state_map) +
+  geom_sf_interactive(
+    aes(geometry = geometry,
+      fill = percentage_bin,
+      tooltip = paste("State FIPS:", stfips,
+                      "<br>Completed:", percentage_completed, "%")),
+    color = "#ffffff", size = 0.25) +
+  labs(fill = "% of Completed Treatment Episodes",
+       title = "Completed Treatment Episodes by State",
+       subtitle = "TEDS-D Dataset (SAMHSA)") +
+  scale_fill_viridis_d(option = "mako", direction = -1, na.value = "pink") + 
+  coord_sf(datum = NA) +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5),
+    strip.text = element_text(size = 4))
+
+girafe(ggobj = option1)
+```
+
+#### Option 2
+
+Set up your binning so that `0` is included in the bin intervals. You can do this by adding either or both of the following to `cut()`, but pay attention to the outcomes:
+
+-   `right = FALSE`
+
+-   `include.lowest = TRUE`
+
+```{r}
+right_true <- percent_completed_by_state_map %>% 
+  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80),
+                              right = FALSE))
+
+option2a <- ggplot(right_true) +
+  geom_sf_interactive(
+    aes(geometry = geometry,
+      fill = percentage_bin,
+      tooltip = paste("State FIPS:", stfips,
+                      "<br>Completed:", percentage_completed, "%")),
+    color = "#ffffff", size = 0.25) +
+  labs(fill = "% of Completed Treatment Episodes",
+       title = "Completed Treatment Episodes by State",
+       subtitle = "TEDS-D Dataset (SAMHSA)") +
+  scale_fill_viridis_d(option = "mako", direction = -1) + 
+  coord_sf(datum = NA) +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5),
+    strip.text = element_text(size = 4))
+
+girafe(ggobj = option2a)
+```
+
+```{r}
+include_lowest <- percent_completed_by_state_map %>% 
+  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80),
+                              include.lowest = TRUE))
+
+option2b <- ggplot(include_lowest) +
+  geom_sf_interactive(
+    aes(geometry = geometry,
+      fill = percentage_bin,
+      tooltip = paste("State FIPS:", stfips,
+                      "<br>Completed:", percentage_completed, "%")),
+    color = "#ffffff", size = 0.25) +
+  labs(fill = "% of Completed Treatment Episodes",
+       title = "Completed Treatment Episodes by State",
+       subtitle = "TEDS-D Dataset (SAMHSA)") +
+  scale_fill_viridis_d(option = "mako", direction = -1) + 
+  coord_sf(datum = NA) +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5),
+    strip.text = element_text(size = 4))
+
+girafe(ggobj = option2b)
+
+# if you want to rename the levels in your legend, you can use labels() inside EITHER cut() or ggplot(). check online for documentation or see Amber
+
+```
+
+#### Option 3
+
+One final option is to create a catch-all bin for `NA` values and assign it a category name. It will automatically assume a color from whichever color scale you've chosen.
+
+```{r}
+extra_bin <- percent_completed_by_state_map %>% 
+  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80)),
+         percentage_bin = fct_explicit_na(percentage_bin, na_level = "No Data"))
+
+option3 <- ggplot(extra_bin) +
+  geom_sf_interactive(
+    aes(geometry = geometry,
+      fill = percentage_bin,
+      tooltip = paste("State:", state_abbv,
+                      "<br>FIPS:", stfips,
+                      "<br>Treatment completed:", round(percentage_completed,2), "%")), # also decided to fix the tooltip while we are here
+    color = "#ffffff", size = 0.25) +
+  labs(fill = "% of Completed Treatment Episodes",
+       title = "Completed Treatment Episodes by State",
+       subtitle = "TEDS-D Dataset (SAMHSA)") +
+  scale_fill_viridis_d(option = "mako", direction = -1) + 
+  coord_sf(datum = NA) +
+  theme_minimal() +
+  theme(panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    legend.text = element_text(size = 4),
+    legend.title = element_text(size = 5),
+    strip.text = element_text(size = 4))
+
+girafe(ggobj = option3)
+```
 
 ------------------------------------------------------------------------
 
