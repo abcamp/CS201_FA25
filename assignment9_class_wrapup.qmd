@@ -52,7 +52,7 @@ assigned_topics <- names %>%
 
 print(assigned_topics)
 
-write.csv("data/assignment9_assigned_topics.csv")
+write.csv(assigned_topics, "data/assignment9_assigned_topics.csv")
 
 # note that if you run the above script and randomize the names again, your outcome will be different from mine!!
 # go with the topics assigned in class and announced on Canvas!
