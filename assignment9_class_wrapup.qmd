@@ -68,7 +68,7 @@ write.csv(assigned_topics, "data/assignment9_assigned_topics.csv")
 
 4.  Come to class Wednesday and show us how it's done :)
 
-#### Extra libraries needed (if any)
+#### Extra libraries needed (if any) 
 
 ```{r, message=FALSE}
 library(janitor)
