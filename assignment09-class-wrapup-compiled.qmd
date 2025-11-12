@@ -76,6 +76,7 @@ assigned
 library(janitor)
 library(here)
 library(plotly)
+library(scales)
 ```
 
 #### Read in penguins data
@@ -152,15 +153,57 @@ adelie_or_long_bill
 
 ## Calvin - `dplyr::summarize`
 
-```{r, message=FALSE}
-# insert code snippet here
+Summarize takes all grouping data and condenses it, we can also use it to look at grouped statistics.
 
+```{r, message=FALSE, warning=FALSE}
+
+dplyr::summarize(penguins)
+
+```
+
+By grouping the penguins table by sex we can see the number of males and females in the dataset by using the count function in conjunction with the summarize function
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  group_by(sex) %>% 
+  summarize(count = n())
+```
+
+we can also use multiple functions
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  group_by(island) %>% 
+  summarize(mean = mean(flipper_length_mm, na.rm = TRUE), count = n())
+```
+
+and we can use multiple groupings
+
+```{r, message=FALSE, warning=FALSE}
+penguins %>% 
+  group_by(sex, island) %>% 
+  summarize(biggest = max(body_mass_g, na.rm = TRUE), count = n())
 ```
 
 ## Amara - `dplyr::case_when` vs. `ifelse()`
 
 ```{r, message=FALSE}
-# insert code snippet here
+# example 1: ifelse()
+penguins %>%
+  mutate(flipper_size = ifelse(flipper_length_mm > 200, "Big", "Small")) %>%
+  select(species, flipper_length_mm, flipper_size) %>%
+  head()
+#basically one test, two outcomes.. its best 
+
+#example 2: case_when()
+penguins %>%
+  mutate(flipper_category = case_when(
+    flipper_length_mm < 190 ~ "Short",
+    flipper_length_mm < 210 ~ "Medium",
+    TRUE ~ "Long"
+  )) %>%
+  select(species, flipper_length_mm, flipper_category) %>%
+  head()
 
 ```
 
@@ -173,16 +216,69 @@ adelie_or_long_bill
 
 ## Kanani - `arrange()`
 
+arrange puts data in order so this is shortest to longest
+
+penguins: my data \|\>: then do this arrange: put in order by that colum
+
 ```{r, message=FALSE}
-# insert code snippet here
+names(penguins)
+
+penguins |> arrange(culmen_length_mm)
 
 ```
 
 ## Grace - `facet_wrap()` vs. `facet_grid()`
 
-```{r, message=FALSE}
-# insert code snippet here
+`facet_wrap()` allows you to break a plot into multiple smaller plots based on one categorical variable and is arranged into multiple rows and columns. The facets are wrapped and/or rearranged into new rows when they don't fit.
 
+```{r, message=FALSE, warning=FALSE}
+# facet_wrap()
+
+wrap <- ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(size=0.75, alpha = 0.75) +
+  facet_wrap(~ species, # organizes plots based on species
+             labeller = labeller(species = c(
+               "Adelie Penguin (Pygoscelis adeliae)" = "Adelie",
+               "Chinstrap penguin (Pygoscelis antarctica)" = "Chinstrap",
+               "Gentoo penguin (Pygoscelis papua)" = "Gentoo"
+             ))) +
+  labs(
+    title = "Flipper Length vs Body Mass",
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+
+ggplotly(wrap)
+```
+
+`facet_grid()` allows you to compare ***two*** categorical factors of your data across various rows and columns in a fixed grid. Each combination will get its own panel and it will notwrap or rearrange.
+
+```{r, message=FALSE, warning=FALSE}
+# facet_grid()
+
+grid <- ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(size = 0.75, alpha = 0.5) +
+  facet_grid(sex ~ species, # organizes plots in a row-column structure based on sex and species
+             labeller = labeller(species = c(
+               "Adelie Penguin (Pygoscelis adeliae)" = "Adelie",
+               "Chinstrap penguin (Pygoscelis antarctica)" = "Chinstrap",
+               "Gentoo penguin (Pygoscelis papua)" = "Gentoo"
+             ))) +
+  labs(
+    title = "Flipper Length vs Body Mass",
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+
+ggplotly(grid)
 ```
 
 ## Sophia - scatterplots and aesthetics (`aes`, `color`, `shape`, `size`)
@@ -271,7 +367,11 @@ ggplotly(p)
 ## Sano - reading in data (various options)
 
 ```{r, message=FALSE}
-# insert code snippet here
+library(readr)
+
+url <- "https://raw.githubusercontent.com/allisonhorst/palmerpenguins/master/inst/extdata/penguins.csv"
+penguins_web <- read_csv(url)
+head(penguins_web)
 
 ```
 
@@ -342,9 +442,85 @@ write.csv(penguin_summary, "data/penguin_summary.csv", row.names = FALSE)
 
 ```
 
-## Larchelle - wild card!
+## Larchelle - *WILDCARD!* Pivot - Long and Wide
 
-```{r, message=FALSE}
-# insert code snippet here
+#### Read in the dataset
 
+```{r, message=FALSE, warning=FALSE}
+salary_subset <- read_csv("data/salary_subset.csv")
+```
+
+#### Ensure columns *annual_salary* and *bonus* are numeric
+
+```{r, message=FALSE, warning=FALSE}
+
+salary_subset <- salary_subset %>%
+  mutate(
+    annual_salary = if (is.numeric(annual_salary)) annual_salary else parse_number(annual_salary),
+    bonus = if (is.numeric(bonus)) bonus else parse_number(bonus)
+  ) %>%
+  filter(!is.na(annual_salary))
+```
+
+#### Pivot Longer Example
+
+```{r, message=FALSE, warning=FALSE}
+
+data_long <- salary_subset %>%
+  pivot_longer(
+    cols = c(annual_salary, bonus),
+    names_to = "comp_type",
+    values_to = "amount"
+  )
+
+print(data_long)
+```
+
+#### Pivot Wider Example
+
+```{r, message=FALSE, warning=FALSE}
+
+industry_summary <- data_long %>%
+  group_by(industry, comp_type) %>%
+  summarize(avg_amount = mean(amount, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(
+    names_from = comp_type,
+    values_from = avg_amount
+  )
+
+print(industry_summary)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+# VIS FOR PIVOT_LONGER: compare salary vs bonus by industry
+ggplot(data_long, aes(x = reorder(industry, amount), y = amount, fill = comp_type)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(
+    title = "Salary vs Bonus by Industry (Long Format)",
+    x = "Industry",
+    y = "Amount",
+    fill = "Compensation Type"
+  ) +
+  theme_minimal()
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+# VIS FOR PIVOT_WIDER: average salary and bonus by industry
+ggplot(industry_summary, aes(x = reorder(industry, annual_salary))) +
+  geom_col(aes(y = annual_salary, fill = "Salary")) +
+  geom_col(aes(y = bonus, fill = "Bonus"), alpha = 0.7) +
+  coord_flip() +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_fill_manual(values = c("Salary" = "steelblue", "Bonus" = "skyblue")) +
+  labs(
+    title = "Average Salary and Bonus by Industry (Wide Format)",
+    x = "Industry",
+    y = "Amount",
+    fill = "Compensation Type"
+  ) +
+  theme_minimal()
 ```
