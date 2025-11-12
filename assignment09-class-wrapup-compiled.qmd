@@ -1,0 +1,350 @@
+---
+title: "Assignment 9: Class Wrap-up"
+format: html
+editor: visual
+author: "CS-201 Students, Fall 2025"
+date: "`r Sys.Date()`"
+toc: true
+---
+
+We are finally at the end of the semester! The final assignment for the class will be to summarize and share some of the things we've done so far.
+
+The plan is for everyone to be randomly paired with a tiny topic pertaining to something we've learned together this semester and then submit a code snippet to be presented in class on Wednesday, 11/12. (Think \~2 minute walkthrough)
+
+#### Libraries
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+#### Read in the list of topics
+
+```{r, message=FALSE}
+# topics <- read_csv("data/cs201_topics.csv")
+# view(topics)
+
+# anything to edit?
+# topics[7, "topic"] <- "wildcard"
+```
+
+#### Read in the list of student names
+
+```{r, message=FALSE}
+# names <- read_csv("data/cs201_names.csv")
+# view(names)
+```
+
+#### Generate a random number in the names dataframe
+
+```{r, message=FALSE}
+# names <- names %>%
+#   mutate(number = sample(1:nrow(topics), nrow(names), replace = FALSE))
+# 
+# view(names)
+```
+
+#### Join the names to the topics
+
+```{r, message=FALSE}
+# assigned_topics <- names %>%
+#   full_join(topics, by = "number")
+# 
+# print(assigned_topics)
+# 
+# write.csv(assigned_topics, "data/assignment9_assigned_topics.csv")
+
+# note that if you run the above script and randomize the names again, your outcome will be different from mine!!
+# go with the topics assigned in class and announced on Canvas!
+
+assigned <- read_csv("data/assignment9_assigned_topics.csv")
+assigned
+```
+
+## Instructions
+
+1.  Find your assigned topic. Talk to me if you reeeeeeaaaally want to do something else, or trade with someone (but let me know).
+
+2.  Prepare a code snippet that briefly (\~2) explains the topic in the code chunk below, using `penguins` data.
+
+3.  Push to GitHub **BY 10:00am** on Wednesday 11/12 (I'll need time to compile before class).
+
+4.  Come to class Wednesday and show us how it's done :)
+
+#### Extra libraries needed (if any)
+
+```{r, message=FALSE}
+library(janitor)
+library(here)
+library(plotly)
+```
+
+#### Read in penguins data
+
+```{r, message=FALSE}
+penguins <- read_csv(here("data/penguins_lter.csv"))
+
+penguins <- penguins %>% 
+  clean_names()
+```
+
+## Tallen - boxplots vs. violin plots
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = species, y = flipper_length_mm, fill = species)) +
+  geom_boxplot() +
+  geom_jitter(size = 0.5) + # adding some datapoints and jittering them
+  theme_bw() + # sets overall plot theme (think background, axes, bounding box)
+  scale_fill_viridis_d() +
+  labs(title = "Palmer Penguins, Distribution of Flipper Length",
+       subtitle = "3 penguin species observed on three islands in the Palmer Archipelago, Antarctica",
+       x = "",
+       y = "Flipper length (mm)") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1), legend.position = "none") +
+  coord_flip()
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Basic violin plot: body mass by species
+ggplot(data = penguins, aes(x = species, y = body_mass_g, fill = species)) +
+  geom_violin(trim = FALSE) +
+  labs(
+    title = "Distribution of Penguin Body Mass by Species",
+    x = "Penguin Species",
+    y = "Body Mass (g)"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Pastel1")
+
+```
+
+## Brandon - `dplyr::filter`
+
+```{r, message=FALSE, warning=FALSE}
+head(penguins)
+
+# Example 1: Filter for a single condition
+# Show only penguins from the Adelie species
+adelie_penguins <- penguins %>%
+  filter(species == "Adelie Penguin (Pygoscelis adeliae)")
+
+# Example 2: Filter for multiple conditions
+# Show only female Chinstrap penguins with body mass over 3500g
+chinstrap_males_heavy <- penguins %>%
+  filter(species == "Chinstrap penguin (Pygoscelis antarctica)", sex == "MALE", body_mass_g > 3500)
+
+# Example 3: Use OR conditions with |
+# Show penguins that are either Adelie OR have a flipper length over 190 mm
+adelie_or_long_bill <- penguins %>%
+  filter(species == "Adelie Penguin (Pygoscelis adeliae)" | flipper_length_mm > 190)
+
+# Print results
+adelie_or_long_bill
+
+```
+
+## Aichen - `dplyr::mutate`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Calvin - `dplyr::summarize`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Amara - `dplyr::case_when` vs. `ifelse()`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Cody - `select()` and `rename()`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Kanani - `arrange()`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Grace - `facet_wrap()` vs. `facet_grid()`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Sophia - scatterplots and aesthetics (`aes`, `color`, `shape`, `size`)
+
+-   `aes`: maps data to visuals
+
+-   `color`: controls point color
+
+-   `shape`: controls point shape/symbol
+
+-   `size`: controls point size
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g, color = species)) +
+   geom_point(shape = 17) +
+  theme_bw() +
+  scale_color_viridis_d()
+
+```
+
+## Karl - customizing plots (labs, themes, titles)
+
+#### labs/titles: adds titles, subtitles, and axis labels.
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_histogram(alpha = 0.5) +
+  theme_classic() +
+  scale_fill_manual(values = c("darkorange","darkorchid","cyan4")) +
+  labs(title = "Palmer Penguins, Distribution of Flipper Length",
+       subtitle = "3 penguin species observed on three islands in the Palmer Archipelago, Antarctica",
+       x = "Flipper Length (mm)",
+       y = "Number of Penguins")
+
+```
+
+#### themes: applies a black and white theme or background.
+
+There are other themes like theme_minimal(), classic() and more.
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_histogram(alpha = 0.5, bins = 30) +
+  labs(
+    title = "Palmer Penguins: Distribution of Flipper Length",
+    subtitle = "Three species observed in the Palmer Archipelago, Antarctica",
+    x = "Flipper Length (mm)",
+    y = "Number of Penguins"
+  ) +
+  theme_linedraw()
+```
+
+#### fill: scale_fill_manual(): manually pick colors for values.
+
+In the penguins case its species and it matches the penguins species category. You can change the colors to whatever color you want.
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_histogram(alpha = 0.5, bins = 30) +
+  theme_dark() +
+  scale_fill_manual(values = c("pink", "yellow", "cyan")) +
+  labs(
+    title = "Palmer Penguins: Distribution of Flipper Length",
+    subtitle = "Three species observed in the Palmer Archipelago, Antarctica",
+    x = "Flipper Length (mm)",
+    y = "Number of Penguins"
+  )
+```
+
+## Shelley - `plotly`
+
+```{r, message=FALSE, warning=FALSE}
+p <- ggplot(penguins, aes(x = culmen_length_mm, 
+                          y = culmen_depth_mm, 
+                          color = species)) +
+  geom_point(size = 3) +
+  labs( title = "Penguin Bill Size Comparison",
+       x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  theme_minimal()
+
+ggplotly(p)
+
+```
+
+## Sano - reading in data (various options)
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Sadie - `skimr` and/or `naniar`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Vlad - `count()` and `group_by()`
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Johnny - `ggsave()` and `write.csv()`
+
+Start by making a scatter plot of penguin body mass vs flipper length:
+
+```{r, message=FALSE, warning=FALSE}
+penguin_plot <- ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(alpha = 0.8) +
+  theme_bw() +
+  labs(
+    title = "Penguin Body Mass vs Flipper Length",
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)",
+    color = "Species"
+  )
+
+penguin_plot
+```
+
+#### Save The Plot as Image File
+
+`ggsave` saves the plot as a png in data folder
+
+```{r, warning=FALSE}
+ggsave("data/penguin_plot.png", penguin_plot, width = 6, height = 4, dpi = 300)
+```
+
+#### Summary Table of Average Body Mass/ Species
+
+Create a summary table - groups data by species and calculate average body mass for each group.
+
+```{r}
+penguin_summary <- penguins %>%
+  group_by(species) %>%
+  summarise(avg_mass_g = mean(body_mass_g, na.rm = TRUE))
+
+penguin_summary
+```
+
+#### Save Summary Table as CSV file
+
+`write.csv` saves that summary table as csv file in the data folder
+
+```{r}
+write.csv(penguin_summary, "data/penguin_summary.csv", row.names = FALSE)
+```
+
+## Rei - wild card!
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
+
+## Larchelle - wild card!
+
+```{r, message=FALSE}
+# insert code snippet here
+
+```
