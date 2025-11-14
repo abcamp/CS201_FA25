@@ -218,9 +218,18 @@ penguins %>%
 
 ## Cody - `select()` and `rename()`
 
-```{r, message=FALSE}
-# insert code snippet here
+```{r, message=FALSE, warning=FALSE}
+#select 
+##creates new data frame, keeping chosen columns, in this case keeping study name all the way to delta keeping out comments
+penguins%>%
+  select(study_name:delta_13_c_o_oo)
 
+#rename
+##lets you rename a chosen column in this case changing island_name to island
+penguins%>%
+  rename(island_name=island)
+
+print(penguins)
 ```
 
 ## Kanani - `arrange()`
@@ -381,13 +390,6 @@ library(readr)
 url <- "https://raw.githubusercontent.com/allisonhorst/palmerpenguins/master/inst/extdata/penguins.csv"
 penguins_web <- read_csv(url)
 head(penguins_web)
-
-```
-
-## Sadie - `skimr` and/or `naniar`
-
-```{r, message=FALSE}
-# insert code snippet here
 
 ```
 
