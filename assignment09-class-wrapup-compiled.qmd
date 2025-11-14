@@ -147,7 +147,16 @@ adelie_or_long_bill
 ## Aichen - `dplyr::mutate`
 
 ```{r, message=FALSE}
-# insert code snippet here
+#Part 1: Adding new columns
+### displays flipper length in inches
+
+flipInch_mutated <- penguins %>%
+  mutate(flipinch = flipper_length_mm/25.4)
+
+#Part 2: Another example
+### displays culmen length in km
+culmometers_mutate <- penguins %>%
+  mutate(culmen_length_km = culmen_length_mm/1000000)
 
 ```
 
@@ -384,8 +393,14 @@ head(penguins_web)
 
 ## Vlad - `count()` and `group_by()`
 
-```{r, message=FALSE}
-# insert code snippet here
+```{r, message=FALSE, warning=FALSE}
+penguins %>%
+    count(species, island) %>% 
+    arrange(species)
+
+penguins %>%
+    group_by(species, island) %>%
+    summarise(count = n())
 
 ```
 
@@ -435,10 +450,35 @@ penguin_summary
 write.csv(penguin_summary, "data/penguin_summary.csv", row.names = FALSE)
 ```
 
-## Rei - wild card!
+## Rei - geom_smooth()
 
-```{r, message=FALSE}
+### This is a normal scatter plot
+
+```{r, message=FALSE, warning=FALSE}
 # insert code snippet here
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Flipper Length vs Body Mass with Linear Trend Lines")
+
+```
+
+### add a geom_smooth(method = "lm")
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Flipper Length vs Body Mass with Linear Trend Lines(lm)")
+
+```
+
+### Add a geom_smooth(method = "loess")
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "Flipper Length vs Body Mass with Linear Trend Lines(Loess)")
 
 ```
 
